@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Input, Button, Select } from 'tdesign-react';
 import { MinusCircleIcon } from 'tdesign-icons-react';
 
@@ -13,50 +13,79 @@ const provinceOptions = [
 
 export default function BaseForm() {
   const [form] = Form.useForm();
+  const [initData] = useState({
+    address: [
+      {
+        province: 'bj',
+        area: 'bj',
+      },
+      {
+        province: 'sh',
+        area: 'sh',
+      },
+      {
+        province: 'gz',
+        area: 'gz',
+      },
+      {
+        province: 'sz',
+        area: 'sz',
+      },
+    ],
+  });
 
-  function onSubmit() {
-    const allFields = form.getFieldsValue(true);
-    console.log('allFields', allFields);
-  }
+  const reset = () => {
+    form.reset();
+  };
 
   return (
-    <Form form={form} onSubmit={onSubmit}>
+    <Form form={form} initialData={initData} resetType="initial">
       <FormList name="address">
-        {(fields, { add, remove }) => (
-          <>
-            {fields.map(({ key, name, ...restField }) => (
-              <FormItem key={key}>
-                <FormItem
-                  {...restField}
-                  name={[name, 'province']}
-                  label="省份"
-                  rules={[{ required: true, type: 'error' }]}
-                >
-                  <Select options={provinceOptions}></Select>
-                </FormItem>
-                <FormItem {...restField} name={[name, 'area']} label="地区" rules={[{ required: true, type: 'error' }]}>
-                  <Input />
-                </FormItem>
+        {(fields, { add, remove }) => {
+          console.log('fields', JSON.stringify(fields));
+          return (
+            <>
+              {fields.map(({ key, name, ...restField }) => {
+                console.log(key, name, restField);
+                return (
+                  <FormItem key={key}>
+                    <FormItem>
+                      <FormItem
+                        {...restField}
+                        name={[name, 'province']}
+                        label={`省份${key}`}
+                        rules={[{ required: true, type: 'error' }]}
+                      >
+                        <Select options={provinceOptions}></Select>
+                      </FormItem>
+                      <FormItem
+                        {...restField}
+                        name={[name, 'area']}
+                        label="地区"
+                        rules={[{ required: true, type: 'error' }]}
+                      >
+                        <Input placeholder="" />
+                      </FormItem>
 
-                <FormItem>
-                  <MinusCircleIcon size="20px" style={{ cursor: 'pointer' }} onClick={() => remove(name)} />
-                </FormItem>
+                      <FormItem>
+                        <MinusCircleIcon size="20px" style={{ cursor: 'pointer' }} onClick={() => remove(name)} />
+                      </FormItem>
+                    </FormItem>
+                  </FormItem>
+                );
+              })}
+              <FormItem style={{ marginLeft: 100 }}>
+                <Button theme="default" variant="dashed" onClick={() => add()}>
+                  Add field
+                </Button>
               </FormItem>
-            ))}
-            <FormItem style={{ marginLeft: 100 }}>
-              <Button theme="default" variant="dashed" onClick={() => add({ province: 'bj', area: 'tzmax' })}>
-                Add field
-              </Button>
-            </FormItem>
-          </>
-        )}
+            </>
+          );
+        }}
       </FormList>
       <FormItem style={{ marginLeft: 100 }}>
-        <Button type="submit" theme="primary">
-          提交
-        </Button>
-        <Button type="reset" style={{ marginLeft: 12 }}>
-          重置
+        <Button onClick={() => reset()} theme="primary">
+          reset
         </Button>
       </FormItem>
     </Form>
